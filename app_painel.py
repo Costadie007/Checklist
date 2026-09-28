@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 
-from banco import carregar_estado
+from banco import carregar_estado, carregar_historico
 from roteiros import ROTEIROS
 
 # Troque a senha antes de publicar.
@@ -51,9 +51,20 @@ for coluna, (site, roteiro) in zip(colunas, ROTEIROS.items()):
         st.progress(feitos / total if total else 0)
         st.write(f"{feitos} de {total} concluídos")
         st.caption(f"Última alteração: {estado.get('atualizado_em', 'nenhuma ainda')}")
+        if estado.get("finalizado_em"):
+            st.success(
+                f"Finalizado por {estado.get('finalizado_por', '')} "
+                f"em {estado['finalizado_em']}"
+            )
 
         for secao, lista in roteiro["secoes"].items():
             with st.expander(secao, expanded=True):
                 for indice, texto in enumerate(lista):
                     marcado = estado.get(f"item-{secao}-{indice}", False)
                     st.write(f"{'✅' if marcado else '⬜'} {texto}")
+
+        historico = carregar_historico(site)
+        if historico:
+            with st.expander("Últimas finalizações"):
+                for r in historico:
+                    st.write(f"{r['data']} · {r['operador']} · {r['feitos']}/{r['total']} itens")
