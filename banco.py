@@ -96,3 +96,7 @@ def carregar_historico(site, limite=5):
         with open(arquivo, "r", encoding="utf-8") as f:
             return list(reversed(json.load(f)))[:limite]
     return []
+
+def modo_local():
+    """True quando o Firebase não está configurado e o progresso fica em arquivo local."""
+    return _url_base() is None
